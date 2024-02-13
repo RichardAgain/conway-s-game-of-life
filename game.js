@@ -1,43 +1,80 @@
 
-let text = "□□□□\n□□□□\n□■■■\n□□□□\n□□□□"
+let grid = []
 
-let grid = text.split('\n').map(col => col.split(''))
+for (i = 0; i < rowCount; i++) {
+    let temp =[]
+    for (j = 0; j < colCount; j++) {
+        temp.push(false)
+    }
+    grid.push(temp)
+}
 
-console.log(grid)
+grid[0][0] = true
+grid[1][0] = true
+grid[0][1] = true
+grid[0][0] = true
 
-// while (true) {
-    setInterval(function() {
+grid[99][98] = true
+grid[99][99] = true
+grid[98][99] = true
+grid[0][0] = true
 
-        let newGrid = []
+grid[50][50] = true 
+grid[51][50] = true 
+grid[51][49] = true 
+grid[52][50] = true 
+grid[52][51] = true 
+
+setInterval(function() {
+    let newGrid = []
+    
+    grid.forEach((rows, i) => {
+        let newRow = [] 
         
-        
-        grid.forEach((rows, i) => {
-            let newRow = [] 
-            
-            rows.forEach((dot, j) => {
-                newRow.push(rule(dot, count(i, j)))
-            })
-            newGrid.push(newRow)
+        rows.forEach((dot, j) => {
+            newRow.push(rule(dot, count(i, j)))
+
+            dibujar(i,j,dot)
         })
-        
-        console.log(newGrid)
-        
-        grid = newGrid
-    }, 1000)
-// }
+        newGrid.push(newRow)
+    })
+    
+    console.log(newGrid)
+    grid = newGrid
+}, 1000/ 60)
 
 function count(row, col) {
     let c = 0
     for (let i = row - 1; i <= row + 1; i++ ) {
+        text = ''
         for (let j = col - 1; j <= col + 1; j++ ) {
-            if (i == row && j == col) continue
+            if (i == row && j == col) { text += grid[i][j]; continue }
 
             try {
-                if (grid[i][j] == '■') c++
-            } catch (err) {
-                continue
+                if (j < 0 || j > grid[0].length) throw Error
+
+                if (grid[i][j]) c++
+
+                // text += grid[i][j]
+            } catch(err) {
+                let y = i
+                let x = j
+
+                if (y < 0) y = grid.length - 1
+                else if (y > grid.length - 1) y = 0
+                
+                if (x < 0) x = grid[0].length - 1
+                else if (x > grid[0].length - 1) x = 0
+
+                // if (grid[y][x] == undefined) console.log(x, y)
+
+                if (grid[y][x]) c++
+
+                // text += grid[y][x]
             }
-        }   
+        }
+        
+        // console.log(text)
     }
     return c
 }
@@ -49,9 +86,8 @@ function count(row, col) {
 
 function rule(dot, count) {
     // console.log(count, dot)
-    if (dot == '■') {
-        if (count < 2 || count > 3) return '□'
-        else return '■'
-    } else if (count == 3) return '■'
-        else return '□'
+    if (dot) {
+        return !(count < 2 || count > 3);
+    } else if (count == 3) return true
+        else return false
 }
